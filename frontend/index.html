@@ -1,0 +1,857 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>StudyMate AI</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <div class="logo-icon">
+                    <i data-lucide="graduation-cap"></i>
+                </div>
+
+                <div class="logo-text">
+                    <h2>StudyMate <span>AI</span></h2>
+                    <p>Your AI Learning Partner</p>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+
+                <p class="menu-label">MAIN MENU</p>
+
+                <a href="#" class="nav-link active" data-page="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="#" class="nav-link" data-page="chat">
+                    <i data-lucide="message-square"></i>
+                    <span>AI Study Assistant</span>
+                </a>
+
+                <a href="#" class="nav-link" data-page="documents">
+                    <i data-lucide="files"></i>
+                    <span>My Documents</span>
+                </a>
+
+                <a href="#" class="nav-link" data-page="pyq">
+                    <i data-lucide="file-question"></i>
+                    <span>PYQ Analyzer</span>
+                </a>
+
+                <a href="#" class="nav-link" data-page="tests">
+                    <i data-lucide="clipboard-check"></i>
+                    <span>Mock Tests</span>
+                </a>
+
+                <p class="menu-label">PROGRESS</p>
+
+                <a href="#" class="nav-link" data-page="performance">
+                    <i data-lucide="chart-no-axes-combined"></i>
+                    <span>Performance</span>
+                </a>
+
+                <a href="#" class="nav-link" data-page="planner">
+                    <i data-lucide="calendar-days"></i>
+                    <span>Study Planner</span>
+                </a>
+
+            </div>
+
+            <div class="sidebar-bottom">
+                <div class="profile">
+
+                    <div class="profile-avatar">S</div>
+
+                    <div class="profile-info">
+                        <h4>Student</h4>
+                        <p>Free Plan</p>
+                    </div>
+
+                    <i data-lucide="settings"></i>
+
+                </div>
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+
+                <div>
+                    <h3 id="page-title">Dashboard</h3>
+
+                    <p id="page-subtitle">
+                        Welcome back! Here's your learning overview.
+                    </p>
+                </div>
+
+                <div class="topbar-right">
+
+                    <div class="backend-status">
+                        <span class="status-dot"></span>
+
+                        <span id="backend-status-text">
+                            Checking backend...
+                        </span>
+                    </div>
+
+                    <button class="icon-button" title="Notifications">
+                        <i data-lucide="bell"></i>
+                    </button>
+
+                </div>
+
+            </header>
+
+
+            <!-- PAGE CONTAINER -->
+            <section class="page-container" id="page-container">
+
+
+                <!-- =================================
+                     DASHBOARD PAGE
+                ================================== -->
+
+                <div class="page active" id="dashboard-page">
+
+                    <div class="welcome-section">
+
+                        <div>
+                            <h1>Welcome to StudyMate AI 👋</h1>
+
+                            <p>
+                                Your personalized AI-powered learning workspace.
+                            </p>
+                        </div>
+
+                        <div class="welcome-badge">
+                            <i data-lucide="sparkles"></i>
+                            AI Powered Learning
+                        </div>
+
+                    </div>
+
+
+                    <!-- STATISTICS -->
+
+                    <div class="stats-grid">
+
+                        <div class="stat-card">
+
+                            <div class="stat-icon purple">
+                                <i data-lucide="files"></i>
+                            </div>
+
+                            <p>Total Documents</p>
+                            <h2>0</h2>
+
+                            <span>Uploaded study materials</span>
+
+                        </div>
+
+
+                        <div class="stat-card">
+
+                            <div class="stat-icon blue">
+                                <i data-lucide="message-square"></i>
+                            </div>
+
+                            <p>Questions Asked</p>
+                            <h2>0</h2>
+
+                            <span>AI learning interactions</span>
+
+                        </div>
+
+
+                        <div class="stat-card">
+
+                            <div class="stat-icon green">
+                                <i data-lucide="file-question"></i>
+                            </div>
+
+                            <p>PYQ Questions</p>
+                            <h2>0</h2>
+
+                            <span>Previous year questions</span>
+
+                        </div>
+
+
+                        <div class="stat-card">
+
+                            <div class="stat-icon orange">
+                                <i data-lucide="target"></i>
+                            </div>
+
+                            <p>Mock Tests</p>
+                            <h2>0</h2>
+
+                            <span>Practice sessions</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- QUICK ACTIONS -->
+
+                    <div class="section-heading">
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Continue your learning journey.</p>
+                        </div>
+                    </div>
+
+
+                    <div class="quick-actions-grid">
+
+                        <div class="action-card" data-target="chat">
+
+                            <div class="action-icon purple">
+                                <i data-lucide="bot"></i>
+                            </div>
+
+                            <h3>Ask AI Assistant</h3>
+
+                            <p>
+                                Get answers to your study questions.
+                            </p>
+
+                            <span>Start learning →</span>
+
+                        </div>
+
+
+                        <div class="action-card" data-target="documents">
+
+                            <div class="action-icon blue">
+                                <i data-lucide="upload-cloud"></i>
+                            </div>
+
+                            <h3>Upload Documents</h3>
+
+                            <p>
+                                Upload notes and study materials.
+                            </p>
+
+                            <span>Upload now →</span>
+
+                        </div>
+
+
+                        <div class="action-card" data-target="pyq">
+
+                            <div class="action-icon green">
+                                <i data-lucide="file-search"></i>
+                            </div>
+
+                            <h3>Analyze PYQs</h3>
+
+                            <p>
+                                Extract and organize exam questions.
+                            </p>
+
+                            <span>Explore PYQs →</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BOTTOM SECTION -->
+
+                    <div class="bottom-grid">
+
+                        <div class="content-card">
+
+                            <h3>Learning Overview</h3>
+
+                            <p>
+                                Your study statistics and progress
+                                will appear here.
+                            </p>
+
+                            <div class="empty-state">
+                                <i data-lucide="chart-no-axes-column-increasing"></i>
+                                <p>No learning activity yet.</p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="content-card">
+
+                            <h3>System Status</h3>
+
+                            <div class="system-item">
+                                <span>Frontend</span>
+                                <span class="system-active">Active</span>
+                            </div>
+
+                            <div class="system-item">
+                                <span>FastAPI Backend</span>
+                                <span id="backend-card-status">
+                                    Checking...
+                                </span>
+                            </div>
+
+                            <div class="system-item">
+                                <span>AI Service</span>
+                                <span class="system-pending">
+                                    Connected via API
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     AI STUDY ASSISTANT PAGE
+                ================================== -->
+
+                <div class="page" id="chat-page">
+
+                    <div class="chat-layout">
+
+
+                        <!-- CHAT HEADER -->
+
+                        <div class="chat-header">
+
+                            <div class="chat-heading">
+
+                                <div class="chat-avatar">
+                                    <i data-lucide="bot"></i>
+                                </div>
+
+                                <div>
+                                    <h2>StudyMate AI Assistant</h2>
+
+                                    <p>
+                                        <span class="online-dot"></span>
+                                        Your personal learning assistant
+                                    </p>
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                class="new-chat-btn"
+                                id="new-chat-btn"
+                                type="button"
+                            >
+                                <i data-lucide="plus"></i>
+                                New Chat
+                            </button>
+
+                        </div>
+
+
+                        <!-- CHAT MESSAGES -->
+
+                        <div
+                            class="chat-messages"
+                            id="chat-messages"
+                            aria-live="polite"
+                        >
+
+                            <!-- Welcome Screen -->
+
+                            <div
+                                class="welcome-message"
+                                id="chat-welcome"
+                            >
+
+                                <div class="welcome-chat-icon">
+                                    <i data-lucide="sparkles"></i>
+                                </div>
+
+                                <h2>
+                                    How can I help you learn today?
+                                </h2>
+
+                                <p>
+                                    Ask questions, understand difficult
+                                    concepts, and improve your knowledge
+                                    with AI.
+                                </p>
+
+
+                                <!-- SUGGESTED QUESTIONS -->
+
+                                <div class="suggestion-grid">
+
+                                    <button
+                                        type="button"
+                                        class="suggestion-card"
+                                        data-prompt="Explain Object Oriented Programming with examples."
+                                    >
+                                        <i data-lucide="code"></i>
+                                        <span>Explain OOP concepts</span>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="suggestion-card"
+                                        data-prompt="Explain how Machine Learning works in simple English."
+                                    >
+                                        <i data-lucide="brain"></i>
+                                        <span>Learn Machine Learning</span>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="suggestion-card"
+                                        data-prompt="Explain Database Normalization with examples."
+                                    >
+                                        <i data-lucide="database"></i>
+                                        <span>Understand DBMS</span>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="suggestion-card"
+                                        data-prompt="Explain how Large Language Models work."
+                                    >
+                                        <i data-lucide="bot"></i>
+                                        <span>Explore Generative AI</span>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CHAT INPUT SECTION -->
+
+                        <div class="chat-input-section">
+
+
+                            <!-- DOCUMENT MODE -->
+
+                            <label class="document-toggle">
+
+                                <input
+                                    type="checkbox"
+                                    id="use-documents"
+                                >
+
+                                <i data-lucide="files"></i>
+
+                                Answer using my uploaded documents
+
+                            </label>
+
+
+                            <!-- MESSAGE FORM -->
+
+                            <form
+                                id="chat-form"
+                                class="chat-form"
+                            >
+
+                                <textarea
+                                    id="chat-input"
+                                    placeholder="Ask anything about your studies..."
+                                    rows="1"
+                                    required
+                                ></textarea>
+
+
+                                <button
+                                    type="submit"
+                                    id="send-btn"
+                                    title="Send message"
+                                >
+                                    <i data-lucide="send"></i>
+                                </button>
+
+                            </form>
+
+
+                            <p class="chat-disclaimer">
+                                StudyMate AI can make mistakes.
+                                Verify important information.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     MY DOCUMENTS PAGE
+                ================================== -->
+
+                
+                <div class="page" id="documents-page">
+
+                    <div class="documents-header">
+                        <div>
+                            <h2>My Documents</h2>
+                            <p>Upload and manage your study materials.</p>
+                        </div>
+
+                        <button type="button" class="upload-btn" id="upload-trigger">
+            <i data-lucide="upload"></i>
+            Upload Document
+                        </button>
+                    </div>
+
+                    <div class="document-upload-card" id="upload-area">
+
+        <div class="upload-icon">
+            <i data-lucide="file-up"></i>
+        </div>
+
+        <h3>Upload your study materials</h3>
+
+        <p>Drag and drop your files here or click to browse.</p>
+
+        <p class="upload-formats">
+            Supported: PDF, DOCX, PPTX, TXT · Maximum size: 10 MB
+        </p>
+
+        <input
+            type="file"
+            id="document-file-input"
+            accept=".pdf,.docx,.pptx,.txt"
+            hidden
+        >
+
+        <button type="button" id="browse-files-btn" class="browse-btn">
+            Browse Files
+        </button>
+
+        <div id="upload-status" class="upload-status"></div>
+
+                    </div>
+
+                    <div class="documents-list-section">
+
+        <div class="documents-list-header">
+            <div>
+                <h3>Uploaded Documents</h3>
+                <p>Your indexed study materials</p>
+            </div>
+
+            <button type="button" id="refresh-documents-btn">
+                <i data-lucide="refresh-cw"></i>
+                Refresh
+            </button>
+        </div>
+
+        <div id="documents-list" class="documents-grid">
+
+            <div class="documents-empty">
+                <i data-lucide="folder-open"></i>
+                <p>Loading your documents...</p>
+            </div>
+
+        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================
+                     PYQ ANALYZER PAGE
+                ================================== -->
+
+                
+<div class="page" id="pyq-page">
+
+    <div class="pyq-header">
+        <div>
+            <h2>PYQ Analyzer</h2>
+            <p>Upload previous-year papers and analyze important topics.</p>
+        </div>
+    </div>
+
+    <!-- Upload PYQ Paper -->
+    <div class="pyq-upload-card">
+
+        <div class="pyq-section-heading">
+            <i data-lucide="file-up"></i>
+            <h3>Upload Question Paper</h3>
+        </div>
+
+        <form id="pyq-upload-form">
+
+            <div class="pyq-form-grid">
+
+                <div class="pyq-form-group">
+                    <label for="pyq-subject">Subject</label>
+                    <input
+                        type="text"
+                        id="pyq-subject"
+                        placeholder="e.g. DBMS, Operating System"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="pyq-form-group">
+                    <label for="pyq-year">Examination Year</label>
+                    <input
+                        type="number"
+                        id="pyq-year"
+                        min="1900"
+                        max="2100"
+                        placeholder="e.g. 2025"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <div class="pyq-file-area">
+
+                <i data-lucide="file-pdf"></i>
+
+                <p>Select your question paper PDF</p>
+
+                <input
+                    type="file"
+                    id="pyq-file"
+                    accept=".pdf,application/pdf"
+                    hidden
+                    required
+                >
+
+                <button
+                    type="button"
+                    id="pyq-browse-btn"
+                    class="browse-btn"
+                >
+                    Browse PDF
+                </button>
+
+                <p id="pyq-file-name">No file selected</p>
+
+            </div>
+
+            <button
+                type="submit"
+                id="pyq-upload-btn"
+                class="upload-btn"
+            >
+                <i data-lucide="upload"></i>
+                Upload and Analyze
+            </button>
+
+            <div id="pyq-upload-status" class="pyq-status"></div>
+
+        </form>
+
+    </div>
+
+    <!-- Analytics -->
+    <div class="pyq-analytics-section">
+
+        <div class="pyq-section-heading">
+            <i data-lucide="chart-no-axes-combined"></i>
+            <h3>Question Analytics</h3>
+        </div>
+
+        <div class="pyq-analytics-grid">
+
+            <div class="pyq-stat-card">
+                <p>Total Questions</p>
+                <h2 id="pyq-total-questions">0</h2>
+            </div>
+
+            <div class="pyq-stat-card">
+                <p>Total Topics</p>
+                <h2 id="pyq-total-topics">0</h2>
+            </div>
+
+            <div class="pyq-stat-card">
+                <p>Examination Years</p>
+                <h2 id="pyq-total-years">0</h2>
+            </div>
+
+        </div>
+
+        <div class="pyq-analytics-grid">
+
+            <div class="pyq-stat-card">
+                <h4>Topic-wise Questions</h4>
+                <div id="pyq-topic-analytics">
+                    No analytics available.
+                </div>
+            </div>
+
+            <div class="pyq-stat-card">
+                <h4>Year-wise Questions</h4>
+                <div id="pyq-year-analytics">
+                    No analytics available.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Saved Questions -->
+    <div class="pyq-questions-section">
+
+        <div class="pyq-questions-header">
+            <div>
+                <h3>Extracted Questions</h3>
+                <p>Browse and filter your previous-year questions.</p>
+            </div>
+
+            <button type="button" id="pyq-refresh-btn">
+                <i data-lucide="refresh-cw"></i>
+                Refresh
+            </button>
+        </div>
+
+        <div class="pyq-filters">
+
+            <input
+                type="text"
+                id="pyq-subject-filter"
+                placeholder="Filter by subject"
+            >
+
+            <input
+                type="number"
+                id="pyq-year-filter"
+                placeholder="Filter by year"
+                min="1900"
+                max="2100"
+            >
+
+            <button type="button" id="pyq-filter-btn">
+                Apply Filters
+            </button>
+
+            <button type="button" id="pyq-clear-filter-btn">
+                Clear
+            </button>
+
+        </div>
+
+        <div id="pyq-questions-list">
+
+            <div class="documents-empty">
+                Loading questions...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+                <!-- =================================
+                     MOCK TESTS PAGE
+                ================================== -->
+
+                <div class="page placeholder-page" id="tests-page">
+
+                    <h1>Mock Tests</h1>
+
+                    <p>
+                        Practice AI-generated mock tests here.
+                    </p>
+
+                </div>
+
+
+                <!-- =================================
+                     PERFORMANCE PAGE
+                ================================== -->
+
+                <div class="page placeholder-page" id="performance-page">
+
+                    <h1>Performance</h1>
+
+                    <p>
+                        Track your learning progress here.
+                    </p>
+
+                </div>
+
+
+                <!-- =================================
+                     STUDY PLANNER PAGE
+                ================================== -->
+
+                <div class="page placeholder-page" id="planner-page">
+
+                    <h1>Study Planner</h1>
+
+                    <p>
+                        Organize your study schedule here.
+                    </p>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- FOOTER -->
+
+            <footer class="footer">
+
+                StudyMate AI © 2026 |
+                Built with Python, FastAPI and JavaScript
+
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="js/app.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/documents.js"></script>
+    <script src="js/pyq.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+
+# Python virtual environment
+venv/
+.venv/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE and editor
+.vscode/
+.idea/
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
+# Keep project data and database safe for now
+# Local databases and generated data
+data/*
+!data/.gitkeep
+
+# Streamlit legacy frontend
+frontend/app.py
+
+# Old standalone experiment
+/app.py
