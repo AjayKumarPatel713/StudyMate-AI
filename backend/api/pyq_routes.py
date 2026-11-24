@@ -124,18 +124,18 @@ async def upload_pyq(
 )
 def list_pyq_questions(
     subject: str | None = Query(default=None, max_length=100),
-    exam_year: int | None = Query(default=None, ge=1900, le=2100)
+    exam_year: int | None = Query(default=None, ge=1900, le=2100),
+    topic: str | None = Query(default=None, max_length=100)
 ):
     """
-    Retrieve all saved PYQ questions.
-    Optionally filter by subject and examination year.
+    Retrieve PYQ questions with optional subject, year and topic filters.
     """
 
     return get_all_questions(
         subject=subject,
-        exam_year=exam_year
+        exam_year=exam_year,
+        topic=topic
     )
-
 
 @router.get("/analytics")
 def get_pyq_analytics(

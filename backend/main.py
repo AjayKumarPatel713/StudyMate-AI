@@ -5,6 +5,7 @@ from backend.api.pyq_routes import router as pyq_router
 from backend.config import settings
 from backend.api.chat_routes import router as chat_router
 from backend.api.document_routes import router as document_router
+from backend.api.practice_routes import router as practice_router
 
 
 app = FastAPI(
@@ -44,3 +45,4 @@ def health_check():
 app.include_router(chat_router)
 app.include_router(document_router)
 app.include_router(pyq_router)
+app.include_router(practice_router)

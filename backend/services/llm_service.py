@@ -36,7 +36,8 @@ def get_gemini_client():
 
 def generate_response(
     prompt: str,
-    system_instruction: str | None = None
+    system_instruction: str | None = None,
+    max_output_tokens: int = 1024
 ) -> str:
     """Send a prompt to Gemini and return its response."""
 
@@ -48,7 +49,7 @@ def generate_response(
     config = types.GenerateContentConfig(
         system_instruction=system_instruction,
         temperature=0.7,
-        max_output_tokens=1024,
+        max_output_tokens=max_output_tokens,
         automatic_function_calling=(
             types.AutomaticFunctionCallingConfig(
                 disable=True

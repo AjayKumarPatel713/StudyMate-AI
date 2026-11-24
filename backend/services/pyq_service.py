@@ -1,17 +1,46 @@
 
 import json
 import re
+import uuid
 from pathlib import Path
 
 from backend.services.document_service import extract_document
 from backend.services.llm_service import generate_response
+from backend.database.repository import save_question
 
 
-MAX_BATCH_CHARS = 8000
+# Keep Gemini requests small to avoid incomplete JSON responses.
+MAX_BATCH_CHARS = 2500
+MAX_PAGE_TEXT_CHARS = 2200
+PYQ_OUTPUT_TOKENS = 4096
+
+
+def _split_page_text(text: str) -> list[str]:
+    """Split long page text into smaller chunks."""
+
+    chunks = []
+
+    while len(text) > MAX_PAGE_TEXT_CHARS:
+        split_position = text.rfind(
+            " ",
+            0,
+            MAX_PAGE_TEXT_CHARS
+        )
+
+        if split_position <= 0:
+            split_position = MAX_PAGE_TEXT_CHARS
+
+        chunks.append(text[:split_position].strip())
+        text = text[split_position:].strip()
+
+    if text:
+        chunks.append(text)
+
+    return chunks
 
 
 def _create_page_batches(segments: list[dict]) -> list[str]:
-    """Group extracted pages into manageable text batches."""
+    """Group extracted page text into manageable batches."""
 
     batches = []
     current_pages = []
@@ -19,22 +48,28 @@ def _create_page_batches(segments: list[dict]) -> list[str]:
 
     for segment in segments:
         page_number = segment.get("page_number")
-        page_text = segment["text"].strip()
+        page_text = segment.get("text", "").strip()
 
         if not page_text:
             continue
 
-        page_content = (
-            f"\n--- Page {page_number} ---\n{page_text}"
-        )
+        page_chunks = _split_page_text(page_text)
 
-        if current_pages and current_size + len(page_content) > MAX_BATCH_CHARS:
-            batches.append("\n".join(current_pages))
-            current_pages = []
-            current_size = 0
+        for chunk in page_chunks:
+            page_content = (
+                f"\n--- Page {page_number} ---\n{chunk}"
+            )
 
-        current_pages.append(page_content)
-        current_size += len(page_content)
+            if (
+                current_pages
+                and current_size + len(page_content) > MAX_BATCH_CHARS
+            ):
+                batches.append("\n".join(current_pages))
+                current_pages = []
+                current_size = 0
+
+            current_pages.append(page_content)
+            current_size += len(page_content)
 
     if current_pages:
         batches.append("\n".join(current_pages))
@@ -50,7 +85,7 @@ def _parse_gemini_response(response_text: str) -> list[dict]:
 
     cleaned_text = response_text.strip()
 
-    # Remove Markdown JSON code fences, if present.
+    # Remove Markdown JSON code fences.
     cleaned_text = re.sub(
         r"^```(?:json)?\s*",
         "",
@@ -60,18 +95,23 @@ def _parse_gemini_response(response_text: str) -> list[dict]:
 
     cleaned_text = re.sub(r"\s*```$", "", cleaned_text)
 
-    # Extract the JSON object if Gemini adds extra text.
+    # Extract JSON object if Gemini adds extra text.
     start = cleaned_text.find("{")
     end = cleaned_text.rfind("}")
 
     if start == -1 or end == -1 or end < start:
-        raise ValueError("Gemini did not return valid JSON.")
+        raise ValueError(
+            "Gemini returned incomplete JSON. "
+            "Try processing the paper again."
+        )
 
     try:
         data = json.loads(cleaned_text[start:end + 1])
+
     except json.JSONDecodeError as error:
         raise ValueError(
-            "Could not parse the questions returned by Gemini."
+            "Gemini returned incomplete or invalid JSON. "
+            "The response may have reached its output limit."
         ) from error
 
     if not isinstance(data, dict):
@@ -80,7 +120,9 @@ def _parse_gemini_response(response_text: str) -> list[dict]:
     questions = data.get("questions")
 
     if not isinstance(questions, list):
-        raise ValueError("Gemini response does not contain a valid questions list.")
+        raise ValueError(
+            "Gemini response does not contain a valid questions list."
+        )
 
     validated_questions = []
 
@@ -90,7 +132,10 @@ def _parse_gemini_response(response_text: str) -> list[dict]:
 
         question_text = item.get("question_text")
 
-        if not isinstance(question_text, str) or len(question_text.strip()) < 10:
+        if (
+            not isinstance(question_text, str)
+            or len(question_text.strip()) < 10
+        ):
             continue
 
         topic = item.get("topic")
@@ -101,7 +146,10 @@ def _parse_gemini_response(response_text: str) -> list[dict]:
         else:
             topic = topic.strip() or None
 
-        if isinstance(marks, bool) or not isinstance(marks, (int, float)):
+        if (
+            isinstance(marks, bool)
+            or not isinstance(marks, (int, float))
+        ):
             marks = None
         elif marks <= 0 or marks > 100:
             marks = None
@@ -136,6 +184,8 @@ Instructions:
 6. Do not invent questions, topics, or marks.
 7. Ignore page numbers, headers, footers, and general instructions.
 8. Return only valid JSON. Do not include Markdown or explanations.
+9. Do not stop in the middle of a question.
+10. Include all questions present in this batch.
 
 Required JSON structure:
 {{
@@ -152,7 +202,10 @@ If no questions are found, return:
 {{"questions": []}}
 """
 
-    response = generate_response(prompt)
+    response = generate_response(
+        prompt,
+        max_output_tokens=PYQ_OUTPUT_TOKENS
+    )
 
     return _parse_gemini_response(response)
 
@@ -164,9 +217,10 @@ def extract_questions_from_paper(
     original_filename: str | None = None
 ) -> dict:
     """
-    Extract questions from a text-based PDF question paper.
+    Extract questions from a PDF question paper.
 
-    Returns the extracted questions with paper metadata.
+    Supports both text-based and scanned PDFs through
+    the document extraction service.
     """
 
     if not subject or not subject.strip():
@@ -193,11 +247,14 @@ def extract_questions_from_paper(
     all_questions = []
     seen_questions = set()
 
-    for batch in batches:
+    for batch_number, batch in enumerate(batches, start=1):
+        print(
+            f"Processing PYQ batch {batch_number}/{len(batches)}..."
+        )
+
         extracted_questions = _extract_questions_from_batch(batch)
 
         for question in extracted_questions:
-            # Avoid saving exact duplicate questions.
             normalized_text = " ".join(
                 question["question_text"].lower().split()
             )
@@ -221,11 +278,6 @@ def extract_questions_from_paper(
         "total_questions": len(all_questions),
         "questions": all_questions
     }
-
-
-import uuid
-
-from backend.database.repository import save_question
 
 
 def process_and_save_pyq(
@@ -262,5 +314,7 @@ def process_and_save_pyq(
         "exam_year": result["exam_year"],
         "total_questions": result["total_questions"],
         "saved_questions": saved_count,
-        "message": f"{saved_count} questions extracted and saved successfully."
+        "message": (
+            f"{saved_count} questions extracted and saved successfully."
+        )
     }

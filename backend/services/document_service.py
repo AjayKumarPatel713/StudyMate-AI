@@ -1,7 +1,16 @@
+import pytesseract
 
+pytesseract.pytesseract.tesseract_cmd = (
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+)
 from pathlib import Path
+from io import BytesIO
 
 import pymupdf
+import pytesseract
+from PIL import Image
+from pytesseract import TesseractNotFoundError
+
 from docx import Document
 from pptx import Presentation
 
@@ -14,7 +23,7 @@ def extract_document(
 ) -> dict:
     """
     Extract text from PDF, DOCX, PPTX or TXT documents.
-    Preserve page numbers and slide numbers wherever available.
+    Automatically uses OCR for PDF pages without extractable text.
     """
 
     path = Path(file_path)
@@ -53,6 +62,30 @@ def _extract_pdf(path: Path, filename: str) -> dict:
         for page_number, page in enumerate(pdf, start=1):
             text = page.get_text("text").strip()
 
+            # Use OCR when a page has no extractable text.
+            if not text:
+                try:
+                    pix = page.get_pixmap(
+                        matrix=pymupdf.Matrix(2, 2),
+                        alpha=False
+                    )
+
+                    image = Image.open(
+                        BytesIO(pix.tobytes("png"))
+                    )
+
+                    text = pytesseract.image_to_string(
+                        image,
+                        lang="eng",
+                        config="--psm 6"
+                    ).strip()
+
+                except TesseractNotFoundError as error:
+                    raise RuntimeError(
+                        "Tesseract OCR is not installed or not configured. "
+                        "Install Tesseract and add it to your system PATH."
+                    ) from error
+
             if text:
                 segments.append({
                     "text": text,
@@ -62,8 +95,7 @@ def _extract_pdf(path: Path, filename: str) -> dict:
 
     if not segments:
         raise ValueError(
-            "No extractable text found in this PDF. "
-            "It may be scanned or contain only images. OCR is not enabled yet."
+            "No readable text found in this PDF, even after OCR."
         )
 
     return {

@@ -155,7 +155,6 @@ def test_document_not_found():
     assert response.json()["detail"] == "Document not found."
 
 
-
 def test_normal_chat_api(monkeypatch):
     """Normal chat should use Gemini directly."""
 
@@ -258,7 +257,6 @@ def test_rag_chat_returns_sources(monkeypatch):
     assert data["sources"][0]["similarity"] == 0.89
 
 
-
 def test_pyq_upload_api(monkeypatch, tmp_path):
     """PYQ upload should process and save extracted questions."""
 
@@ -348,9 +346,10 @@ def test_list_pyq_questions(monkeypatch):
         }
     ]
 
-    def fake_get_all_questions(subject=None, exam_year=None):
+    def fake_get_all_questions(subject=None, exam_year=None, topic=None):
         assert subject == "DBMS"
         assert exam_year == 2024
+        assert topic is None
         return expected_questions
 
     monkeypatch.setattr(

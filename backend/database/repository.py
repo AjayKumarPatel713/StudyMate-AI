@@ -174,12 +174,14 @@ def get_question_by_id(question_id: str) -> dict | None:
         connection.close()
 
 
+
 def get_all_questions(
     subject: str | None = None,
-    exam_year: int | None = None
+    exam_year: int | None = None,
+    topic: str | None = None
 ) -> list[dict]:
     """
-    Retrieve all PYQ questions, optionally filtered by subject and year.
+    Retrieve PYQ questions with optional subject, year and topic filters.
     """
 
     connection = get_connection()
@@ -188,13 +190,17 @@ def get_all_questions(
         query = "SELECT * FROM pyq_questions WHERE 1=1"
         parameters = []
 
-        if subject is not None:
+        if subject:
             query += " AND subject = ?"
-            parameters.append(subject)
+            parameters.append(subject.strip())
 
         if exam_year is not None:
             query += " AND exam_year = ?"
             parameters.append(exam_year)
+
+        if topic:
+            query += " AND LOWER(topic) = LOWER(?)"
+            parameters.append(topic.strip())
 
         query += " ORDER BY exam_year DESC, created_at DESC"
 
@@ -207,6 +213,7 @@ def get_all_questions(
 
     finally:
         connection.close()
+
 
 
 def delete_question(question_id: str) -> bool:
@@ -248,6 +255,222 @@ def get_questions_by_topic(
             ORDER BY exam_year DESC
             """,
             (subject, topic)
+        ).fetchall()
+
+        return [dict(row) for row in rows]
+
+    finally:
+        connection.close()
+
+
+
+def create_practice_session(
+    subject: str | None,
+    exam_year: int | None,
+    topic: str | None,
+    question_ids: list[str]
+) -> str:
+    """
+    Create a practice session and initialize its question responses.
+    Returns the session ID.
+    """
+
+    from uuid import uuid4
+
+    session_id = str(uuid4())
+
+    connection = get_connection()
+
+    try:
+        connection.execute(
+            """
+            INSERT INTO practice_sessions (
+                session_id,
+                subject,
+                exam_year,
+                topic,
+                total_questions
+            )
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                session_id,
+                subject,
+                exam_year,
+                topic,
+                len(question_ids)
+            )
+        )
+
+        for question_id in question_ids:
+            connection.execute(
+                """
+                INSERT INTO practice_answers (
+                    answer_id,
+                    session_id,
+                    question_id
+                )
+                VALUES (?, ?, ?)
+                """,
+                (
+                    str(uuid4()),
+                    session_id,
+                    question_id
+                )
+            )
+
+        connection.commit()
+        return session_id
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+def save_practice_answer(
+    session_id: str,
+    question_id: str,
+    selected_answer: str
+) -> bool:
+    """
+    Save or update a user's answer to a practice question.
+    """
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE practice_answers
+            SET selected_answer = ?,
+                is_attempted = 1,
+                answered_at = CURRENT_TIMESTAMP
+            WHERE session_id = ?
+              AND question_id = ?
+            """,
+            (
+                selected_answer,
+                session_id,
+                question_id
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    finally:
+        connection.close()
+
+
+def get_practice_session(session_id: str) -> dict | None:
+    """
+    Retrieve a practice session along with its questions and answers.
+    """
+
+    connection = get_connection()
+
+    try:
+        session = connection.execute(
+            """
+            SELECT *
+            FROM practice_sessions
+            WHERE session_id = ?
+            """,
+            (session_id,)
+        ).fetchone()
+
+        if not session:
+            return None
+
+        answers = connection.execute(
+            """
+            SELECT
+                pa.answer_id,
+                pa.question_id,
+                pa.selected_answer,
+                pa.is_attempted,
+                pa.answered_at,
+                pq.question_text,
+                pq.topic,
+                pq.marks
+            FROM practice_answers pa
+            JOIN pyq_questions pq
+                ON pa.question_id = pq.question_id
+            WHERE pa.session_id = ?
+            """,
+            (session_id,)
+        ).fetchall()
+
+        result = dict(session)
+        result["answers"] = [dict(row) for row in answers]
+
+        return result
+
+    finally:
+        connection.close()
+
+
+def update_practice_session_status(
+    session_id: str,
+    status: str
+) -> bool:
+    """
+    Update practice session status.
+    """
+
+    if status not in ("in_progress", "completed"):
+        raise ValueError("Invalid practice session status.")
+
+    connection = get_connection()
+
+    try:
+        if status == "completed":
+            cursor = connection.execute(
+                """
+                UPDATE practice_sessions
+                SET status = ?,
+                    completed_at = CURRENT_TIMESTAMP
+                WHERE session_id = ?
+                """,
+                (status, session_id)
+            )
+        else:
+            cursor = connection.execute(
+                """
+                UPDATE practice_sessions
+                SET status = ?,
+                    completed_at = NULL
+                WHERE session_id = ?
+                """,
+                (status, session_id)
+            )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    finally:
+        connection.close()
+
+
+def get_practice_history() -> list[dict]:
+    """
+    Retrieve all practice sessions, newest first.
+    """
+
+    connection = get_connection()
+
+    try:
+        rows = connection.execute(
+            """
+            SELECT *
+            FROM practice_sessions
+            ORDER BY started_at DESC
+            """
         ).fetchall()
 
         return [dict(row) for row in rows]

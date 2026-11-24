@@ -4,7 +4,9 @@ from pathlib import Path
 
 from backend.database.models import (
     CREATE_DOCUMENTS_TABLE,
-    CREATE_PYQ_QUESTIONS_TABLE
+    CREATE_PYQ_QUESTIONS_TABLE,
+    CREATE_PRACTICE_SESSIONS_TABLE,
+    CREATE_PRACTICE_ANSWERS_TABLE
 )
 
 
@@ -41,6 +43,8 @@ def initialize_database() -> None:
     try:
         connection.execute(CREATE_DOCUMENTS_TABLE)
         connection.execute(CREATE_PYQ_QUESTIONS_TABLE)
+        connection.execute(CREATE_PRACTICE_SESSIONS_TABLE)
+        connection.execute(CREATE_PRACTICE_ANSWERS_TABLE)
 
         connection.commit()
 

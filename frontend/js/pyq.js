@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const questionsList = document.getElementById("pyq-questions-list");
     const subjectFilter = document.getElementById("pyq-subject-filter");
     const yearFilter = document.getElementById("pyq-year-filter");
+    const topicFilter = document.getElementById("pyq-topic-filter");
 
     const filterButton = document.getElementById("pyq-filter-btn");
     const clearFilterButton = document.getElementById("pyq-clear-filter-btn");
@@ -161,13 +162,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         footer.append(source, deleteButton);
-
         card.append(top, questionText, footer);
 
         return card;
     }
 
-    // Load saved questions with optional filters.
+    // Load saved questions with subject, year and topic filters.
     async function loadQuestions() {
         showMessage(questionsList, "Loading questions...");
 
@@ -180,6 +180,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (yearFilter.value.trim()) {
                 params.set("exam_year", yearFilter.value.trim());
+            }
+
+            if (topicFilter.value.trim()) {
+                params.set("topic", topicFilter.value.trim());
             }
 
             const response = await fetch(
@@ -240,10 +244,15 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (!Number.isInteger(Number(year)) ||
+        if (
+            !Number.isInteger(Number(year)) ||
             Number(year) < 1900 ||
-            Number(year) > 2100) {
-            showUploadStatus("Please enter a valid examination year.", "error");
+            Number(year) > 2100
+        ) {
+            showUploadStatus(
+                "Please enter a valid examination year.",
+                "error"
+            );
             return;
         }
 
@@ -302,6 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             subjectFilter.value = subject;
             yearFilter.value = year;
+            topicFilter.value = "";
 
             await refreshPYQData();
 
@@ -372,13 +382,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Form submission.
     uploadForm.addEventListener("submit", uploadPYQ);
 
-    // Apply filters.
+    // Apply all filters.
     filterButton.addEventListener("click", refreshPYQData);
 
-    // Clear filters.
+    // Clear all filters.
     clearFilterButton.addEventListener("click", async () => {
         subjectFilter.value = "";
         yearFilter.value = "";
+        topicFilter.value = "";
 
         await refreshPYQData();
     });
